@@ -91,24 +91,30 @@ class Game():
                 l, 0, color), (x, y + K.FONT_SIZE*i))
 
     def load_images(self):
+        w = pygame.display.get_window_size()[0]
+        h = pygame.display.get_window_size()[1]
+        print(w, h)
+        img_width = w *0.48
+        img_height = h * 0.8
+
         bg_image = pygame.image.load("./src/images/bg.jpg").convert()
-        self.bg_image = pygame.transform.scale(bg_image, (K.WIDTH, K.HEIGHT))
+        self.bg_image = pygame.transform.scale(bg_image, (w, h))
         leo_start = pygame.image.load(
             "./src/images/leo/leo.png").convert_alpha()
-        self.leo_start = pygame.transform.scale(leo_start, (600, 600))
+        self.leo_start = pygame.transform.scale(leo_start, (img_width, img_height))
         leo_wow = pygame.image.load(
             "./src/images/leo/leo_wow.png").convert_alpha()
-        self.leo_wow = pygame.transform.scale(leo_wow, (600, 600))
+        self.leo_wow = pygame.transform.scale(leo_wow, (img_width, img_height))
         leo_mmm = pygame.image.load(
             "./src/images/leo/leo_mmm.png").convert_alpha()
-        self.leo_mmm = pygame.transform.scale(leo_mmm, (600, 600))
+        self.leo_mmm = pygame.transform.scale(leo_mmm, (img_width, img_height))
         leo_sad = pygame.image.load(
             "./src/images/leo/leo_noo.png").convert_alpha()
-        self.leo_sad = pygame.transform.scale(leo_sad, (600, 600))
+        self.leo_sad = pygame.transform.scale(leo_sad, (img_width, img_height))
         bubble = pygame.image.load(
             "./src/images/bubble.png").convert_alpha()
-        self.bubble = pygame.transform.scale(bubble, (300, 300))
-        self.set_image(self.leo_start)
+        self.bubble = pygame.transform.scale(bubble, (img_width/2, img_height/2))
+        if not self.is_playing(): self.set_image(self.leo_start)
 
     def get_static_boxes(self):
         return [self.new_game_box, self.stop_game_box, self.exit_box]
@@ -118,6 +124,9 @@ class Game():
         self.stop_game_box.set_bg_color()
         self.exit_box.set_bg_color()
 
+    def update_input(self, screen):
+            screen.blit(self.guess_text, (400, 70))
+            self.input_box.draw(screen)
     def get_input(self):
         return self.input_box.text
 
@@ -128,3 +137,28 @@ class Game():
 
     def set_image(self, image):
         self.image = image
+
+    def render_window(self, screen):
+        screen.blit(self.bg_image, (0, 0))
+        w = pygame.display.get_window_size()[0]
+        h = pygame.display.get_window_size()[1]
+        # Rendering del gioco
+        screen.blit(self.image, (700 * w / K.WIDTH, 200 * h / K.HEIGHT))
+        screen.blit(self.bubble, (700* w / K.WIDTH, 00 * h / K.HEIGHT))
+        self.draw_texts(screen, "black", 755* w / K.WIDTH, 85* w / K.WIDTH)
+
+        if self.is_playing():
+            self.update_input(screen)
+
+        # Rendering delle box statiche
+        for box in self.get_static_boxes():
+            box.draw(screen)
+
+        pygame.display.flip()
+        
+    def button_hovered(self, pos):
+        arr = self.get_static_boxes()
+        for box in arr:
+            if box.check_clicked(pos) and box.active:
+                return True
+        return False

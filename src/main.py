@@ -17,11 +17,14 @@ static_boxes = game.get_static_boxes()
 while game.is_running():
     for event in pygame.event.get():
         if event.type == pygame.MOUSEMOTION:
-            if game.new_game_box.check_clicked(event.pos):
+            if game.button_hovered(event.pos):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         if event.type == pygame.VIDEORESIZE:
             screen = pygame.display.set_mode((event.w, event.h),
                                              pygame.RESIZABLE)
+            game.load_images()
         if event.type == pygame.QUIT:
             game.running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -47,23 +50,10 @@ while game.is_running():
                         game.get_input()+event.unicode)
 
     # RENDERING
-    screen.blit(game.bg_image, (0, 0))
-
-    # Rendering del gioco
-    screen.blit(game.image, (700, 200))
-    screen.blit(game.bubble, (700, 00))
-    game.draw_texts(screen, "black", 755, 85)
-
-    if game.is_playing():
-        screen.blit(game.guess_text, (400, 70))
-        game.input_box.draw(screen)
-
-    # Rendering delle box statiche
-    for box in static_boxes:
-        box.draw(screen)
-
+    game.render_window(screen)
+    
     pygame.display.flip()
 
-    clock.tick(60)  # limits FPS to 60
+    clock.tick(15) 
 
 pygame.quit()
